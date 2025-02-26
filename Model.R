@@ -40,7 +40,8 @@ mov_cal <- base_calibration_data %>%
   select(-c(2, 4:7, 35)) # Movie calibration set
 
 act_cal <- base_calibration_data %>% 
-  filter(MM==1)
+  filter(MM==1) %>% 
+  select(-c(2, 4:7, 35))
 
 actr_cal <- base_calibration_data %>% 
   filter(FF==1)
@@ -53,9 +54,33 @@ dir_cal <- base_calibration_data %>%
 mov_cal_df <- mov_cal %>%
   select(-c(1,2,"Gdr", "Gm2"))
 
+act_cal_df <- act_cal %>% 
+  select(-c(1,2,"Gdr", "Gm2"))
+
+str(act_cal_df)
+
 mov_model <- glm(Ch ~ ., data=mov_cal_df, family = binomial)
 summary(mov_model)
 
+act_model <- glm(Ch ~ ., data=act_cal_df, family = binomial)
+summary(act_model)
+
+model.null = glm(Ch ~ 1, data=mov_cal_df, family = binomial)
+model.full = glm(Ch ~ ., data=mov_cal_df, family = binomial)
+forward = step(model.full, scope = list(lower = model.null, upper = model.full),
+               direction = "backward")
+summary(forward)
+
+mov_model_best <- glm(Ch ~ Nom + Dir + Aml + Afl + Ams + Scr + Cin + PrNl + PrNs + 
+                        PrWs + PrN + Gmc + Gd + Gm1 + PGA + DGA + Length + Days + 
+                        WR, data=mov_cal_df, family=binomial)
+
+act_model_best <- glm(Ch ~ Nom + Dir + Aml + Afl + Ams + Scr + Cin + PrNl + PrNs + 
+                        PrWs + PrN + Gmc + Gd + Gm1 + PGA + DGA + Length + Days + 
+                        WR, data=act_cal_df, family=binomial)
+summary(act_model_best)
+
+summary(mov_model_best)
 # Define prediction dataset
 
 base_calibration_data <- oscar_df %>% 
@@ -87,7 +112,18 @@ mov_pred_df <- mov_pred %>%
   select(-c(1,2, "Gdr", "Gm2")) %>%
   mutate(Ams=as.numeric(Ams))
 
+act_pred <- base_calibration_data %>% 
+  filter(MM==1) %>% 
+  select(-c(2, 4:8, 35))
+
+act_pred_df <- act_pred %>% 
+  select(-c(1,2, "Gdr", "Gm2")) %>%
+  mutate(Ams=as.numeric(Ams))
+
 str(mov_pred_df)
 str(mov_cal_df)
-predicted_probs <- predict(mov_model, mov_pred_df, type = "response")
+predicted_probs <- predict(mov_model_best, mov_pred_df, type = "response")
 predicted_probs
+
+predicted_probs_act <- predict(act_model_best, act_pred_df, type = "response")
+predicted_probs_act
