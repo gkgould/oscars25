@@ -1,7 +1,7 @@
 library(tidyverse)
 library(dplyr)
 library(MASS)
-oscars <- read_csv("Oscars Data 2025 - GCAK(oscars) (1).csv")
+oscars <- read_csv("Oscars Data 2025 - GCAK(oscars) CP.csv")
 
 for (col in colnames(oscars)) {
     unique_vals <- unique(na.omit(oscars[[col]])) # Get unique values in the column, ignoring NA
