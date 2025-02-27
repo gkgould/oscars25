@@ -1,35 +1,41 @@
 library(tidyverse)
 library(dplyr)
 library(MASS)
-oscars <- read_csv("Oscars Data 2025 - GCAK(oscars) CP.csv")
-letterboxd <- read_csv("ratings_export.csv")
+# oscars <- read_csv("Oscars Data 2025 - GCAK(oscars) CP.csv")
+# letterboxd <- read_csv("ratings_export.csv")
 
-# Clean letterboxd dataset 
-letterboxd <- letterboxd %>%
-  mutate(Movie = str_replace_all(movie_id, "-", " ") %>% str_to_title(),) %>% 
-  group_by(Movie) %>%
-  summarise(rating_val = mean(rating_val, na.rm = TRUE))
+## Clean letterboxd dataset 
+#letterboxd <- letterboxd %>%
+#  mutate(Movie = str_replace_all(movie_id, "-", " ") %>% str_to_title(),) %>% 
+#  group_by(Movie) %>%
+#  summarise(rating_val = mean(rating_val, na.rm = TRUE))
 
-# Clean oscars dataset
-for (col in colnames(oscars)) {
-    unique_vals <- unique(na.omit(oscars[[col]])) # Get unique values in the column, ignoring NA
-    # Check if the column contains ONLY 0s and 1s (no other values)
-    if (all(unique_vals %in% c(0, 1)) && length(unique_vals) == 2) {
-      # Convert to a factor with levels 0 and 1
-      oscars[[col]] <- factor(oscars[[col]], levels = c(0, 1))
-    }
-  }
+## Clean oscars dataset
+# for (col in colnames(oscars)) {
+#    unique_vals <- unique(na.omit(oscars[[col]])) # Get unique values in the column, ignoring NA
+#    # Check if the column contains ONLY 0s and 1s (no other values)
+#    if (all(unique_vals %in% c(0, 1)) && length(unique_vals) == 2) {
+#      # Convert to a factor with levels 0 and 1
+#      oscars[[col]] <- factor(oscars[[col]], levels = c(0, 1))
+#    }
+#  }
 
-oscars <- oscars %>% dplyr::select(-c(1:6, "AD", "Comp", 26:36, 56:69, "PGPG13", "U", 71:92, 95:105, 107)) %>% 
-  mutate(Year = as.factor(Year),
-         Ch = factor(ifelse(Ch == 2, 0, Ch), levels = c(0, 1)),
-         vibes = ifelse(is.na(vibes), 0, vibes))
+# oscars <- oscars %>% dplyr::select(-c(1:6, "AD", "Comp", 26:36, 56:69, "PGPG13", "U", 71:92, 95:105, 107)) %>% 
+#  mutate(Year = as.factor(Year),
+#         Ch = factor(ifelse(Ch == 2, 0, Ch), levels = c(0, 1)),
+#         vibes = ifelse(is.na(vibes), 0, vibes))
 
-# Merge letterboxd ratings into oscars data
-oscars <- oscars %>% 
-  left_join(letterboxd %>% dplyr::select(Movie, rating_val), by = "Movie") %>%
-  mutate(vibes = vibes * (10 / 3),
-         rating_val = ifelse(is.na(rating_val), vibes, rating_val))
+## Merge letterboxd ratings into oscars data
+# oscars <- oscars %>% 
+#  left_join(letterboxd %>% dplyr::select(Movie, rating_val), by = "Movie") %>%
+#  mutate(vibes = vibes * (10 / 3),
+#         rating_val = ifelse(is.na(rating_val), vibes, rating_val))
+
+## Make new CSV with combined data
+# write.csv(oscars, "oscars_with_ratings.csv", row.names = FALSE)
+
+# Read in new combined dataset
+oscars <- read_csv("oscars_with_ratings.csv")
 
 # Create category subset data# Create category subset data
 BP_df <- data.frame()
