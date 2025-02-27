@@ -6,13 +6,13 @@ library(tidyverse)
 
 # DATA PREPROCESSING
 
-oscar_df <- read.csv("Oscardata.csv")
+oscar_df <- read.csv("Oscars Data 2025 - GCAK(oscars) (1).csv")
 
 # Select key variables starting with movie name up until Cin variable, then from PrNI-PrW, Gdr-SAF*, Age, Length, Days, WR
 
 base_calibration_data <- oscar_df %>% 
   select(c(8:10, 12:25, 38:54, 70, 93, 94, 106)) %>% #Select relevant variables
-  filter(Year < 2024 & Year > 2008) %>%  # Filter years 2009-2023
+  filter(Year < 2024) %>%  # Filter years 2009-2023
   mutate(Ch = factor(ifelse(Ch == 2, 0, Ch), levels = c(0, 1)))
 
 cols_to_check <- c(4:8, 10:17, 24:34) # Select columns for factorizing
@@ -50,7 +50,7 @@ dir_cal <- base_calibration_data %>%
   filter(DD==1)
 
 # Main model
-
+str(mov_cal_df)
 mov_cal_df <- mov_cal %>%
   select(-c(1,2,"Gdr", "Gm2"))
 
@@ -71,9 +71,8 @@ forward = step(model.full, scope = list(lower = model.null, upper = model.full),
                direction = "backward")
 summary(forward)
 
-mov_model_best <- glm(Ch ~ Nom + Dir + Aml + Afl + Ams + Scr + Cin + PrNl + PrNs + 
-                        PrWs + PrN + Gmc + Gd + Gm1 + PGA + DGA + Length + Days + 
-                        WR, data=mov_cal_df, family=binomial)
+mov_model_best <- glm(Ch ~ Nom + Dir + PrNl + PrNs + PrWs + PrN + PGA + Days + WR, 
+                      data=mov_cal_df, family=binomial)
 
 act_model_best <- glm(Ch ~ Nom + Dir + Aml + Afl + Ams + Scr + Cin + PrNl + PrNs + 
                         PrWs + PrN + Gmc + Gd + Gm1 + PGA + DGA + Length + Days + 
@@ -110,15 +109,21 @@ mov_pred <- base_calibration_data %>%
   
 mov_pred_df <- mov_pred %>% 
   select(-c(1,2, "Gdr", "Gm2")) %>%
-  mutate(Ams=as.numeric(Ams))
+  mutate(Ams=as.numeric(Ams)) %>% 
+  mutate(Afl=as.numeric(Afl)) %>% 
+mutate(Aml=as.numeric(Aml)) %>% 
+mutate(Scr=as.numeric(Scr))
 
 act_pred <- base_calibration_data %>% 
   filter(MM==1) %>% 
-  select(-c(2, 4:8, 35))
+  select(-c(2, 4:8, 35)) 
 
 act_pred_df <- act_pred %>% 
   select(-c(1,2, "Gdr", "Gm2")) %>%
-  mutate(Ams=as.numeric(Ams))
+  mutate(Ams=as.numeric(Ams)) %>% 
+  mutate(Afl=as.numeric(Afl)) %>% 
+  mutate(Aml=as.numeric(Aml)) %>% 
+  mutate(Scr=as.numeric(Scr))
 
 str(mov_pred_df)
 str(mov_cal_df)
