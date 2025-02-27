@@ -103,22 +103,22 @@ for (col in names(t.BFA_df)) {
 t.BFA_df <- t.BFA_df %>% mutate(Year = as.factor(Year)) %>% na.omit()
 
 # Creating training models
-BP.model.null <- glm(Ch ~ 1, data = t.BP_df, family = binomial) # Force in Total Noms, WR, Gdr, SAE
+BP.model.null <- glm(Ch ~ 1, data = t.BP_df, family = binomial) # Option to force in Total Noms, WR, Gdr, SAE
 BP.model.full <- glm(Ch ~ ., data = t.BP_df, family = binomial)
 AIC.t.BP_df <- step(BP.model.null, scope = list(lower = BP.model.null, upper = BP.model.full),
                     direction = "both")
 
-BD.model.null <- glm(Ch ~ 1, data = t.BD_df, family = binomial) # Force in Nom, WR, Gd
+BD.model.null <- glm(Ch ~ 1, data = t.BD_df, family = binomial) # Option to force in Nom, WR, Gd
 BD.model.full <- glm(Ch ~ ., data = t.BD_df, family = binomial)
 AIC.t.BD_df <- step(BD.model.null, scope = list(lower = BD.model.null, upper = BD.model.full),
                     direction = "both")
 
-BMA.model.null <- glm(Ch ~ 1, data = t.BMA_df, family = binomial) # Force in Nom, WR, Gm1
+BMA.model.null <- glm(Ch ~ 1, data = t.BMA_df, family = binomial) # Option to force in Nom, WR, Gm1
 BMA.model.full <- glm(Ch ~ ., data = t.BMA_df, family = binomial)
 AIC.t.BMA_df <- step(BMA.model.null, scope = list(lower = BMA.model.null, upper = BMA.model.full),
                     direction = "both")
 
-BFA.model.null <- glm(Ch ~ 1, data = t.BFA_df, family = binomial) # Force in Nom, WR, Gf1
+BFA.model.null <- glm(Ch ~ 1, data = t.BFA_df, family = binomial) # Option to force in Nom, WR, Gf1
 BFA.model.full <- glm(Ch ~ ., data = t.BFA_df, family = binomial)
 AIC.t.BFA_df <- step(BFA.model.null, scope = list(lower = BFA.model.null, upper = BFA.model.full),
                     direction = "both")
